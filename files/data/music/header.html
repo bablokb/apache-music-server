@@ -9,6 +9,10 @@
 
     <script  type="text/javascript">
       $(document).ready(function() {
+        // set document-title
+        var parts = window.location.pathname.split('/');
+        document.title = decodeURI(parts[parts.length-2]);
+
         // https://stackoverflow.com/questions/16916896/playing-two-files-in-a-row-in-javascript
         // remove pre-tag
         $("pre").replaceWith(function() { return $(this).contents(); });
@@ -17,11 +21,11 @@
         $("img").wrap('<div class="entry w3-bar-item w3-margin-bottom w3-panel w3-theme-l3 w3-round-xxlarge">');
 
         // move links to preceeding div, add audio-controls and save list of MP3
-        mp3_list = []
+        var mp3_list = []
         $("a").each(function() {
            $(this).appendTo($(this).prev());                     // move to div
            if (!$(this).prev().attr("alt").endsWith("DIR]")) {   // prev is now img
-             src = $(this).attr("href");
+             var src = $(this).attr("href");
              mp3_list.push(src);
              $(this).prev().remove();
              $(this).replaceWith(
