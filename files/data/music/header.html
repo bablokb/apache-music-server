@@ -8,42 +8,53 @@
     <script src="/js/jquery-min.js"></script>
 
     <script  type="text/javascript">
+      // handler for 'ended' event
+      function on_audio_ended() {
+        var id = $(this).attr('id');
+        var track = id.slice(6);    // 6 == 'track_'.length
+        var next = $('#track_'+(1+parseInt(track)));
+        if (next) {
+          next[0].play();
+        }
+      };
+
+      // manipulate directory index: create audio-controls for all music-files
       $(document).ready(function() {
         // set document-title
         var parts = window.location.pathname.split('/');
         document.title = decodeURI(parts[parts.length-2]);
 
-        // https://stackoverflow.com/questions/16916896/playing-two-files-in-a-row-in-javascript
         // remove pre-tag
         $("pre").replaceWith(function() { return $(this).contents(); });
 
         // add styling (wrap img with div)
-        $("img").wrap('<div class="entry w3-bar-item w3-margin-bottom w3-panel w3-theme-l3 w3-round-xxlarge">');
+        $("img").wrap('<div class="entry w3-bar-item w3-mobile ' +
+                     'w3-margin-bottom w3-panel w3-theme-l3 w3-round-xxlarge">');
 
-        // move links to preceeding div, add audio-controls and save list of MP3
-        var mp3_list = []
+        // move links to preceeding div, add audio-controls with
+        // track-number as ID
+        var tnr=1;
         $("a").each(function() {
-           $(this).appendTo($(this).prev());                     // move to div
-           if (!$(this).prev().attr("alt").endsWith("DIR]")) {   // prev is now img
+           $(this).appendTo($(this).prev());              // move to div
+           if ($(this).prev().attr("alt") == "[SND]") {   // prev is now img
              var src = $(this).attr("href");
-             mp3_list.push(src);
-             $(this).prev().remove();
-             $(this).replaceWith(
+             $(this).prev().remove();              // remove img and
+             $(this).replaceWith(                  // replace link with audio
                '<div class="w3-center">' +
                  '<h2>'+decodeURI(src)+'</h2>' +
-                 '<audio controls>' +
+                 '<audio id="track_'+tnr+'" controls>' +
                    '<source src="'+src+' "type="audio/mpeg">' + 
                  '</audio><br>' +
                '</div>');
+             $('#track_'+tnr).on('ended',on_audio_ended);
+             tnr += 1;
            } else {
-             $(this).addClass("w3-xlarge");
+             $(this).addClass("w3-mobile w3-xlarge");
            }
         });
 
         // remove column header
         $(".entry").first().remove();
-
-        // add playlist
       });
     </script>
   </head>
